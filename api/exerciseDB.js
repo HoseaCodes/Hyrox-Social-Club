@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { rapidApiKey, baseExerciseUrl } from "../constants";
+import { rapidApiKey, baseExerciseUrl, mongoDBUrl, mongoDBApiKey } from "../constants";
 
 
-const apiCall = async (url, params)=>{
-    try{
-        const options = {
+const apiCall = async (url, params, options)=>{
+    try {
+        if (!options) options = {
             method: 'GET', 
             url,
             params,
@@ -22,8 +22,32 @@ const apiCall = async (url, params)=>{
 }
 
 export const fetchExercisesByBodypart = async (bodyPart)=>{
-    let data = await apiCall(
-      baseExerciseUrl + `/exercises/bodyPart/${bodyPart}`
-    );
+    let data = await apiCall(baseExerciseUrl + `/exercises/bodyPart/${bodyPart}`);
     return data;
 }
+
+export const mutateExercisesByBodypart = async (body) => {
+    const newSet = body.newSet;
+    const options = {
+      method: "POST",
+      url: mongoDBUrl + `/insertOne`,
+      params: null,
+      headers: {
+        "Content-Type": "application/json",
+        apikey: mongoDBApiKey,
+      },
+      data: {
+        collection: "sets",
+        dataSource: "Projects",
+        database: "fitness",
+        document: {
+          username: newSet.username,
+          exercise: newSet.exercise,
+          reps: newSet.reps,
+          weight: newSet.weight,
+        },
+      },
+    };
+    let data = await apiCall(mongoDBUrl + `/insertOne`, null, options);
+  return data;
+};

@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import React from "react";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import React, { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image } from "expo-image";
 import {
@@ -8,8 +8,11 @@ import {
 } from "react-native-responsive-screen";
 import Anticons from "react-native-vector-icons/AntDesign";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import NewSetInput from "../components/NewSetInput";
 
+// Exercise Details Screen
 export default function exerciseDetails() {
+  const [isInstructionExpanded, setIsInstructionExpanded] = useState(false);
   const item = useLocalSearchParams();
   const router = useRouter();
   return (
@@ -84,21 +87,67 @@ export default function exerciseDetails() {
           Instructions
         </Animated.Text>
 
-        {item.instructions?.split(",").map((instruction, index) => {
+        <View style={styles.panel}>
+          <Text
+            style={styles.instructions}
+            numberOfLines={isInstructionExpanded ? 0 : 3}
+          >
+            {item?.instructions}
+          </Text>
+          <Text
+            onPress={() => setIsInstructionExpanded(!isInstructionExpanded)}
+            style={styles.seeMore}
+          >
+            {isInstructionExpanded ? "See less" : "See more"}
+          </Text>
+        </View>
+        {/* {item.instructions?.split(",").map((instruction, index) => {
           return (
             <Animated.Text
               entering={FadeInDown.delay((index + 5) * 100)
                 .duration(300)
                 .springify()}
-              key={instruction}
-              style={{ fontSize: hp(1.7) }}
-              className="text-neutral-800"
-            >
+                key={instruction}
+                style={{ fontSize: hp(1.7) }}
+                className="text-neutral-800"
+                >
               {instruction}
-            </Animated.Text>
+            </Animated.Text> 
           );
-        })}
+        })} */}
+        <NewSetInput exerciseName={item?.name} />
       </ScrollView>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+  },
+  panel: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 5,
+  },
+  exerciseName: {
+    fontSize: 20,
+    fontWeight: "500",
+  },
+  exerciseSubtitle: {
+    color: "dimgray",
+  },
+  subValue: {
+    textTransform: "capitalize",
+  },
+  instructions: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  seeMore: {
+    alignSelf: "center",
+    padding: 5,
+    fontWeight: "600",
+    color: "gray",
+  },
+});

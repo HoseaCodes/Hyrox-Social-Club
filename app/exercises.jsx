@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { fetchExercisesByBodypart } from "../api/exerciseDB";
@@ -12,20 +12,39 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ExerciseList from "../components/ExerciseList";
 import { ScrollView } from "react-native-virtualized-view";
+import { useQuery } from "@tanstack/react-query";
 
+// Bodypart Exercises Screen
 export default function Exercises() {
   const router = useRouter();
-  const [exercises, setExercises] = useState([]);
+  // const [exercises, setExercises] = useState([]);
   const item = useLocalSearchParams();
 
-  useEffect(() => {
-    if (item) getExercises(item.name);
-  }, [item]);
+  // useEffect(() => {
+  //   if (item) getExercises(item.name);
+  // }, [item]);
 
-  const getExercises = async (bodypart) => {
-    let data = await fetchExercisesByBodypart(bodypart);
-    setExercises(data);
-  };
+  // const getExercises = async (bodypart) => {
+  //   let data = await fetchExercisesByBodypart(bodypart);
+  //   setExercises(data);
+  // };
+
+  const { isLoading, error, data, isFetching } = useQuery({
+    queryKey: ["bodyPart"],
+    queryFn: () => fetchExercisesByBodypart(item.name),
+  });
+
+  console.log({ data });
+  console.log('-----------------');
+  // console.log({ exercises });
+
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return <Text>Failed to fetch exercises</Text>;
+  }
   return (
     <ScrollView>
       <StatusBar style="light" />
@@ -49,7 +68,8 @@ export default function Exercises() {
           {item.name} exercises
         </Text>
         <View className="mb-10">
-          <ExerciseList data={exercises} />
+          {/* <ExerciseList data={exercises} /> */}
+          <ExerciseList data={data} />
         </View>
       </View>
     </ScrollView>

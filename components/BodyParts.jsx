@@ -28,6 +28,7 @@ export default function BodyParts() {
   )
 }
 
+// On Home Screen
 const BodyPartCard = ({item, router, index})=>{
     return (
         <Animated.View entering={FadeInDown.duration(400).delay(index*200).springify()}>
